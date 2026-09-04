@@ -3,11 +3,6 @@ require("dotenv").config();
 
 const isProduction =
   process.env.NODE_ENV === "production" || process.env.RENDER;
-const databaseUrl = process.env.DATABASE_URL?.trim().replace(
-  /^['"`]|['"`]$/g,
-  "",
-);
-const hasDatabaseUrl = /^postgres(?:ql)?:\/\//.test(databaseUrl || "");
 
 const connectionOptions = {
   dialect: process.env.DB_DIALECT || "postgres",
@@ -17,17 +12,15 @@ const connectionOptions = {
   logging: false,
 };
 
-const sequelize = hasDatabaseUrl
-  ? new Sequelize(databaseUrl, connectionOptions)
-  : new Sequelize(
-      process.env.DB_NAME,
-      process.env.DB_USER,
-      process.env.DB_PASSWORD,
-      {
-        ...connectionOptions,
-        host: process.env.DB_HOST,
-        port: process.env.DB_PORT,
-      },
-    );
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    ...connectionOptions,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+  },
+);
 
 module.exports = sequelize;
