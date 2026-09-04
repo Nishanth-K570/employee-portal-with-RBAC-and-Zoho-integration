@@ -7,6 +7,7 @@ const databaseUrl = process.env.DATABASE_URL?.trim().replace(
   /^['"`]|['"`]$/g,
   "",
 );
+const hasDatabaseUrl = /^postgres(?:ql)?:\/\//.test(databaseUrl || "");
 
 const connectionOptions = {
   dialect: process.env.DB_DIALECT || "postgres",
@@ -16,7 +17,7 @@ const connectionOptions = {
   logging: false,
 };
 
-const sequelize = databaseUrl
+const sequelize = hasDatabaseUrl
   ? new Sequelize(databaseUrl, connectionOptions)
   : new Sequelize(
       process.env.DB_NAME,
