@@ -94,6 +94,11 @@ cd backend
 cp .env.example .env
 ```
 
+`.env.example` contains placeholders only. Put your real database password,
+JWT secret, and Zoho credentials in `backend/.env`. Never commit or publish
+that file; it is excluded by `.gitignore`. If credentials have been exposed,
+revoke and regenerate them before using this project.
+
 Key variables:
 | Variable | Description |
 |---|---|
