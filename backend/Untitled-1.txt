@@ -1,0 +1,13 @@
+JWT_SECRET=<new random secret>
+DB_HOST=<Render database internal hostname>
+DB_PORT=<Render database port>
+DB_NAME=<Render database name>
+DB_USER=<Render database username>
+DB_PASSWORD=<Render database password>
+DB_DIALECT=postgres
+ZOHO_CLIENT_ID=<new Zoho client ID>
+ZOHO_CLIENT_SECRET=<new Zoho client secret>
+ZOHO_REFRESH_TOKEN=<new Zoho refresh token>
+ZOHO_ACCOUNTS_URL=https://accounts.zoho.com
+ZOHO_API_DOMAIN=https://www.zohoapis.com
+VITE_API_URL=https://employee-portal-backend-7gzn.onrender.com/api
