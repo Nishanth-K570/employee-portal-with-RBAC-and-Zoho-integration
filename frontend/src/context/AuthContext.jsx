@@ -8,45 +8,70 @@ export function AuthProvider({ children }) {
     try {
       const stored = localStorage.getItem("user");
       return stored ? JSON.parse(stored) : null;
-    } catch (e) {
-      console.error("Failed to parse stored user:", e);
+    } catch (error) {
+      console.error("Failed to parse stored user:", error);
+      localStorage.removeItem("user");
       return null;
     }
   });
 
   const [loading, setLoading] = useState(false);
 
-  // Verify token on mount
+  // Verify existing JWT token when the application loads
   useEffect(() => {
     const verifyToken = async () => {
       const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const { data } = await api.get("/auth/me");
-          setUser(data.user);
-        } catch (err) {
-          console.error("Token verification failed:", err);
-          logout();
-        }
+
+      if (!token) {
+        return;
+      }
+
+      try {
+        const { data } = await api.get("/api/auth/me");
+
+        setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
+      } catch (error) {
+        console.error("Token verification failed:", error);
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setUser(null);
       }
     };
 
     verifyToken();
   }, []);
 
+  // Login
   async function login(email, password) {
     setLoading(true);
+
     try {
-      const { data } = await api.post("/auth/login", { email, password });
+      const { data } = await api.post("/api/auth/login", {
+        email,
+        password,
+      });
+
+      // Make sure backend returned the required data
+      if (!data.token || !data.user) {
+        throw new Error("Invalid login response from server");
+      }
+
+      // Save authentication information
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+
+      // Update React authentication state
       setUser(data.user);
+
       return data.user;
     } finally {
       setLoading(false);
     }
   }
 
+  // Logout
   function logout() {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -54,7 +79,14 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        logout,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -62,8 +94,10 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
+
   if (!context) {
     throw new Error("useAuth must be used within AuthProvider");
   }
+
   return context;
 }
